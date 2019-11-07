@@ -53,6 +53,10 @@ class Edit extends Component {
         formData.append('start_year',now.getFullYear());
         formData.append('start_month', now.getMonth()+1);
         formData.append('start_day', now.getDate());
+        formData.append('start_hour', now.getHours());
+        formData.append('start_minute', now.getMinutes());
+        formData.append('start_second', now.getSeconds());
+
         formData.append('end_year',this.state.end_year);
         formData.append('end_month', this.state.end_month);
         formData.append('end_day', this.state.end_day);
