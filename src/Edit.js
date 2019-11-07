@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput} from 'react-native';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, DatePickerAndroid} from 'react-native';
 import { Portal, Toast, Provider } from '@ant-design/react-native'
 
 class Edit extends Component {
@@ -10,8 +10,15 @@ class Edit extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            content: "",
+            content:    "",
+            end_year:   new Date().getFullYear() + 1,
+            end_month:  new Date().getMonth() + 1,
+            end_date:    new Date().getDate(),
         }
+    }
+
+    componentDidMount(){
+        this._openCalendar();
     }
     
 
@@ -27,9 +34,9 @@ class Edit extends Component {
         formData.append('start_year',now.getFullYear());
         formData.append('start_month', now.getMonth()+1);
         formData.append('start_day', now.getDate());
-        formData.append('end_year',now.getFullYear());
-        formData.append('end_month', now.getMonth()+1);
-        formData.append('end_day', now.getDate());
+        formData.append('end_year',this.state.end_year);
+        formData.append('end_month', this.state.end_mont);
+        formData.append('end_day', this.state.end_date);
         formData.append('content', this.state.content);
 
         console.log(formData);
@@ -54,6 +61,25 @@ class Edit extends Component {
 
     }
 
+    async _openCalendar(){
+        try {
+          const {action, year, month, date} = await DatePickerAndroid.open({
+            date: new Date(),
+            mode: 'spinner',
+          });
+          if (action !== DatePickerAndroid.dismissedAction) {
+            console.log(year, month, date);
+            this.setState({
+                end_year:   year,
+                end_month:  month + 1,
+                end_date:    date,
+            })
+          }
+        } catch ({code, message}) {
+          console.warn('Cannot open date picker', message);
+        }
+    }
+
     render() {
         return (
             <Provider>
@@ -70,7 +96,9 @@ class Edit extends Component {
                                 onChangeText={text => {this.setState({content:text})}} value={this.state.text}/>
                     <View style={styles.flexStretch}>
                         <Image style={styles.border} source={require("../images/edit/template.png")} resizeMode="contain"></Image>
-                        <Image style={styles.border} source={require("../images/edit/calendar.png")} resizeMode="contain"></Image>
+                        <TouchableOpacity style={styles.border} onPress={this._openCalendar}>
+                            <Image style={styles.border} source={require("../images/edit/calendar.png")} resizeMode="contain"></Image>
+                        </TouchableOpacity>
                         <Image style={styles.border} source={require("../images/edit/list.png")} resizeMode="contain"></Image>
                         <Image style={styles.border} source={require("../images/edit/rollBack.png")} resizeMode="contain"></Image>
                         <Image style={styles.border} source={require("../images/edit/rollForward.png")} resizeMode="contain"></Image>
