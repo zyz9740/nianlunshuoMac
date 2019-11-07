@@ -72,7 +72,7 @@ class Home extends Component {
                             // keyExtractor={(item, index) => item.id}
                             ListHeaderComponent={
                                 <View style={[styles.flexCenter,{marginTop: 20}]}>
-                                    <Text style={{fontSize: 16}}>—— 当前已有 {this.state.letterCount} 篇文章 ——</Text>
+                                    <Text style={{fontSize: 16}}>—— 当前已有 {this.state.letterCount} 封信件 ——</Text>
                                 </View>}
                             ListFooterComponent={
                                  <View style={[styles.flexCenter,{marginBottom: 20}]}>
