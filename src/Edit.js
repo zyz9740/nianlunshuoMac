@@ -73,6 +73,11 @@ class Edit extends Component {
             })
             Toast.success("信件发送成功。", 1);
             // return response.json();
+            let feedBack = this.props.navigation.getParam('feedBack', '');
+            console.log(feedBack);
+            feedBack();
+            setTimeout(()=>{this.props.navigation.goBack()}, 1500);
+            
         })
         .catch((error) => {
             console.error(error);
@@ -80,27 +85,9 @@ class Edit extends Component {
 
     }
 
-    async _openCalendar(){
-        try {
-          const {action, year, month, date} = await DatePickerAndroid.open({
-            date: new Date(),
-            mode: 'spinner',
-          });
-          if (action !== DatePickerAndroid.dismissedAction) {
-            console.log(year, month, date);
-            this.setState({
-                end_year:   year,
-                end_month:  month + 1,
-                end_date:    date,
-            })
-          }
-        } catch ({code, message}) {
-          console.warn('Cannot open date picker', message);
-        }
-    }
-
     render() {
         console.log(this.state);
+        let now = new Date();
         return (
             <Provider>
                 <View style={{backgroundColor:'#fefdfb', flex:1}}>
@@ -112,7 +99,7 @@ class Edit extends Component {
                     </View>
                     <TextInput style={{flex: 1, padding: 25, textAlignVertical: 'top', fontSize: 20}} 
                                 autoFocus={true} placeholder="刻录你的年轮" multiline={true}  
-                                onChangeText={text => {this.setState({content:text})}} value={this.state.text}/>
+                                onChangeText={text => {this.setState({content:text})}} value={this.state.content}/>
                     <View style={styles.flexStretch}>
                         <Image style={styles.border} source={require("../images/edit/template.png")} resizeMode="contain"></Image>
                         <TouchableOpacity onPress={this.showDateTimePicker}>
@@ -122,6 +109,7 @@ class Edit extends Component {
                               onConfirm={this.handleDatePicked}
                               onCancel={this.hideDateTimePicker}
                               mode={'date'}
+                              maximumDate={now}
                             />
                         </TouchableOpacity>
                         <Image style={styles.border} source={require("../images/edit/list.png")} resizeMode="contain"></Image>
