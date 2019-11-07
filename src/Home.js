@@ -16,11 +16,6 @@ class Home extends Component {
         this._fetchData();
     }
 
-    componentWillMount(){
-        console.log("refresh Home")
-        this._fetchData();
-    }
-
 
     showDateTimePicker = () => {
         this.setState({ isDateTimePickerVisible: true });
@@ -37,10 +32,12 @@ class Home extends Component {
             end_year: date.getFullYear(),
             end_month: date.getMonth()+1,
             end_day: date.getDate(),
+            feedBack: this._fetchData,
         });
     };
 
-    _fetchData(){
+    _fetchData = () => {
+        console.log("fetch data from /letter");
         fetch("http://49.235.93.122:8080" + "/letter")
         .then((response) => {
             return response.json();
@@ -91,6 +88,7 @@ class Home extends Component {
                       onConfirm={this.handleDatePicked}
                       onCancel={this.hideDateTimePicker}
                       mode={'date'}
+                      maximumDate={now}
                     />
                 </TouchableOpacity>
             </View>

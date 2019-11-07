@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput} from 'react-native';
+import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput, DatePickerAndroid} from 'react-native';
 import DateTimePicker from "react-native-modal-datetime-picker";
 import { Portal, Toast, Provider } from '@ant-design/react-native'
 
@@ -53,6 +53,10 @@ class Edit extends Component {
         formData.append('start_year',now.getFullYear());
         formData.append('start_month', now.getMonth()+1);
         formData.append('start_day', now.getDate());
+        formData.append('start_hour', now.getHours());
+        formData.append('start_minute', now.getMinutes());
+        formData.append('start_second', now.getSeconds());
+
         formData.append('end_year',this.state.end_year);
         formData.append('end_month', this.state.end_month);
         formData.append('end_day', this.state.end_day);
@@ -73,6 +77,11 @@ class Edit extends Component {
             })
             Toast.success("信件发送成功。", 1);
             // return response.json();
+            let feedBack = this.props.navigation.getParam('feedBack', '');
+            console.log(feedBack);
+            feedBack();
+            setTimeout(()=>{this.props.navigation.goBack()}, 1500);
+            
         })
         .catch((error) => {
             console.error(error);
@@ -82,6 +91,7 @@ class Edit extends Component {
 
     render() {
         console.log(this.state);
+        let now = new Date();
         return (
             <Provider>
                 <View style={{backgroundColor:'#fefdfb', flex:1}}>
@@ -93,7 +103,7 @@ class Edit extends Component {
                     </View>
                     <TextInput style={{flex: 1, padding: 25, textAlignVertical: 'top', fontSize: 20}} 
                                 autoFocus={true} placeholder="刻录你的年轮" multiline={true}  
-                                onChangeText={text => {this.setState({content:text})}} value={this.state.text}/>
+                                onChangeText={text => {this.setState({content:text})}} value={this.state.content}/>
                     <View style={styles.flexStretch}>
                         <Image style={styles.border} source={require("../images/edit/template.png")} resizeMode="contain"></Image>
                         <TouchableOpacity onPress={this.showDateTimePicker}>
@@ -103,6 +113,7 @@ class Edit extends Component {
                               onConfirm={this.handleDatePicked}
                               onCancel={this.hideDateTimePicker}
                               mode={'date'}
+                              maximumDate={now}
                             />
                         </TouchableOpacity>
                         <Image style={styles.border} source={require("../images/edit/list.png")} resizeMode="contain"></Image>
