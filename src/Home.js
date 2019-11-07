@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {StyleSheet, Image, Text, View, FlatList, TouchableOpacity} from 'react-native';
+import DateTimePicker from "react-native-modal-datetime-picker";
 
 
 class Home extends Component {
@@ -19,6 +20,25 @@ class Home extends Component {
         console.log("refresh Home")
         this._fetchData();
     }
+
+
+    showDateTimePicker = () => {
+        this.setState({ isDateTimePickerVisible: true });
+    };
+
+    hideDateTimePicker = () => {
+        this.setState({ isDateTimePickerVisible: false });
+    };
+
+    handleDatePicked = date => {
+        console.log("A date has been picked: ", date);
+        this.hideDateTimePicker();
+        this.props.navigation.navigate('Edit',{
+            end_year: date.getFullYear(),
+            end_month: date.getMonth()+1,
+            end_day: date.getDate(),
+        });
+    };
 
     _fetchData(){
         fetch("http://49.235.93.122:8080" + "/letter")
@@ -62,10 +82,16 @@ class Home extends Component {
                                     <Text style={{fontSize: 16}}>—— 完 ——</Text>
                                 </View>}                               
                             />
-                <TouchableOpacity onPress={() => this.props.navigation.navigate('Edit')} style={{position: 'absolute',bottom: 35,right: 37,}}>
+                <TouchableOpacity onPress={this.showDateTimePicker} style={{position: 'absolute',bottom: 35,right: 37,}}>
                     <View style={[styles.flexCenter, styles.textBg]}>
                         <Image source={require("../images/home/send.png")} style={{height:48 ,width:56}}></Image>
                     </View>
+                    <DateTimePicker
+                      isVisible={this.state.isDateTimePickerVisible}
+                      onConfirm={this.handleDatePicked}
+                      onCancel={this.hideDateTimePicker}
+                      mode={'date'}
+                    />
                 </TouchableOpacity>
             </View>
         );

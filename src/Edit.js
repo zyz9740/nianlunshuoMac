@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, Image, Text, View, TouchableOpacity, TextInput} from 'react-native';
+import DateTimePicker from "react-native-modal-datetime-picker";
 
 class Edit extends Component {
     static navigationOptions = {
@@ -9,9 +10,34 @@ class Edit extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            end_year: JSON.stringify(this.props.navigation.getParam('end_year', '')),
+            end_month: JSON.stringify(this.props.navigation.getParam('end_month', '')),
+            end_day: JSON.stringify(this.props.navigation.getParam('end_day', '')),
             content: "",
-        }
+            isDateTimePickerVisible: false,
+        };
     }
+
+    showDateTimePicker = () => {
+        this.setState({ isDateTimePickerVisible: true });
+    };
+
+    hideDateTimePicker = () => {
+        this.setState({ isDateTimePickerVisible: false });
+    };
+
+    handleDatePicked = date => {
+        this.setState({
+            end_year: date.getFullYear(),
+            end_month: date.getMonth()+1,
+            end_day: date.getDate(),
+        });
+        console.log("A date has been picked: ", date);
+        console.log(this.state.end_year);
+        console.log(this.state.end_month);
+        console.log(this.state.end_day);
+        this.hideDateTimePicker();
+    };
 
 
     _sendLetter = () =>{
@@ -20,9 +46,9 @@ class Edit extends Component {
         formData.append('start_year',now.getFullYear());
         formData.append('start_month', now.getMonth()+1);
         formData.append('start_day', now.getDate());
-        formData.append('end_year',now.getFullYear());
-        formData.append('end_month', now.getMonth()+1);
-        formData.append('end_day', now.getDate());
+        formData.append('end_year',this.state.end_year);
+        formData.append('end_month', this.state.end_month);
+        formData.append('end_day', this.state.end_day);
         formData.append('content', this.state.content);
 
         console.log(formData);
@@ -47,6 +73,7 @@ class Edit extends Component {
 
 
     render() {
+        console.log(this.state);
         return (
             <View style={{backgroundColor:'#fefdfb', flex:1}}>
                 <View style={styles.topBar}>
@@ -60,7 +87,15 @@ class Edit extends Component {
                             onChangeText={text => {this.setState({content:text})}} value={this.state.text}/>
                 <View style={styles.flexStretch}>
                     <Image style={styles.border} source={require("../images/edit/template.png")} resizeMode="contain"></Image>
-                    <Image style={styles.border} source={require("../images/edit/calendar.png")} resizeMode="contain"></Image>
+                    <TouchableOpacity onPress={this.showDateTimePicker}>
+                        <Image style={styles.border} source={require("../images/edit/calendar.png")} resizeMode="contain"></Image>
+                        <DateTimePicker
+                          isVisible={this.state.isDateTimePickerVisible}
+                          onConfirm={this.handleDatePicked}
+                          onCancel={this.hideDateTimePicker}
+                          mode={'date'}
+                        />
+                    </TouchableOpacity>
                     <Image style={styles.border} source={require("../images/edit/list.png")} resizeMode="contain"></Image>
                     <Image style={styles.border} source={require("../images/edit/rollBack.png")} resizeMode="contain"></Image>
                     <Image style={styles.border} source={require("../images/edit/rollForward.png")} resizeMode="contain"></Image>
