@@ -661,6 +661,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.zyz9740;
 				PRODUCT_NAME = AwesomeProject;
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -682,6 +683,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.zyz9740;
 				PRODUCT_NAME = AwesomeProject;
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

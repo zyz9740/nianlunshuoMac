@@ -48,8 +48,12 @@ class Home extends Component {
         })
         .catch((error) => {
             console.error(error);
+            this.setState({letterCount: error});
         });
     }
+
+    _keyExtractor = (item, index) => item.id;
+
 
     render() {
         // this._fetchData();
@@ -67,9 +71,19 @@ class Home extends Component {
                         <Image source={require("../images/home/more.png")} style={{height:27,width:5,marginLeft:40,marginRight:10}}></Image>
                     </View>
                 </View>
+                <View style={{flexDirection: "row",justifyContent: "space-around",alignItems: "center",maxHeight: 60,padding: 24,}}>
+                    <View style={styles.flexStart}>
+                        <Image source={require("../images/home/status.png")} style={[{height:34,width:34,marginRight:30}]}></Image>
+                        <Text style={{fontSize:20,color:'white'}}>{now.getMonth()+1}月{now.getDate()}日</Text>
+                    </View>
+                    <View style={styles.flexStart}>
+                        <Image source={require("../images/home/search.png")} style={{height:25,width:25}}></Image>
+                        <Image source={require("../images/home/more.png")} style={{height:27,width:5,marginLeft:40,marginRight:10}}></Image>
+                    </View>
+                </View>
                 
                 <FlatList data={this.state.letterList} renderItem={({item}) => this.renderLetter(item)} 
-                            // keyExtractor={(item, index) => item.id}
+                            keyExtractor={(item, index) => item.id}
                             ListHeaderComponent={
                                 <View style={[styles.flexCenter,{marginTop: 20}]}>
                                     <Text style={{fontSize: 16}}>—— 当前已有 {this.state.letterCount} 封信件 ——</Text>
@@ -99,7 +113,7 @@ class Home extends Component {
         // console.log(item);
         return (
             <View style={{justifyContent: "space-between",alignItems: "flex-start",flexDirection: 'row', 
-                            paddingRight: 20, paddingLeft: 30, paddingVertical:20, width: '100%'}}>
+                            paddingRight: 20, paddingLeft: 30, paddingVertical:20, width: '100%'}} key={item}>
                 <View style={{justifyContent: "center",alignItems: "flex-start",flexDirection: 'column', marginRight:30, marginTop: 30}}>
                     <View style={{justifyContent: "center",alignItems: "center",flexDirection: 'column'}}>
                         <Text style={{fontSize: 18}}>{item.from[0]}</Text>
@@ -131,7 +145,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        maxHeight: 70,
+        maxHeight: 60,
         padding: 24,
     },
     flexStart:{
