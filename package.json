@@ -13,14 +13,20 @@
     "@ant-design/icons-react-native": "^1.0.2",
     "@ant-design/react-native": "^3.2.0",
     "@react-native-community/datetimepicker": "^2.1.0",
+    "apsl-react-native-button": "^3.1.1",
+    "lodash": "^4.17.15",
     "react": "16.9.0",
     "react-native": "0.61.2",
     "react-native-calendar-select": "^0.1.2",
     "react-native-calendars": "^1.212.0",
+    "react-native-drawer": "^2.5.1",
+    "react-native-elements": "^1.2.7",
     "react-native-gesture-handler": "^1.5.0",
+    "react-native-global-props": "^1.1.5",
     "react-native-modal-datetime-picker": "^7.6.0",
     "react-native-reanimated": "^1.4.0",
     "react-native-screens": "^1.0.0-alpha.23",
+    "react-native-vector-icons": "^6.6.0",
     "react-navigation": "^4.0.10",
     "react-navigation-stack": "^1.10.3"
   },
@@ -36,5 +42,10 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "rnpm": {
+    "assets": [
+      "./assets/fonts/"
+    ]
   }
 }

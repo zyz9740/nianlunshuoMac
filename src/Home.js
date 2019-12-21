@@ -1,7 +1,17 @@
 import React, { Component } from 'react';
 import {StyleSheet, Image, Text, View, FlatList, TouchableOpacity} from 'react-native';
 import DateTimePicker from "react-native-modal-datetime-picker";
+import {Icon, List} from "@ant-design/react-native";
+import Button from 'apsl-react-native-button'
 
+
+// import {setCustomText} from 'react-native-global-props';
+import Drawer from 'react-native-drawer'
+const Item = List.Item;
+
+
+const utils = require("./utils");
+// setCustomText({style: {fontFamily: 'yuesong'}});
 
 class Home extends Component {
     static navigationOptions = {
@@ -10,10 +20,186 @@ class Home extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            //data
             letterCount: 0,
             letterList: [],
-        }
+            filter:{
+                from:   "",
+                to:     "",
+                tag:    "",                // only one tag can be searched at one time
+            },
+            //state
+            isDateTimePickerVisible: false,
+            dateTimePickerType: "",              // the type of dateTime, type is one of ["", "navigation", "pickFrom", "pickTo"]
+            refreshing: true
+        };
         this._fetchData();
+    }
+
+    _closeDrawer = () => {
+        this._drawer.close()
+    };
+    _openDrawer = () => {
+        this._drawer.open()
+    };
+
+    // use the tag(string) to update filter.tags
+    _setTag = (tag) => {
+        let filter = this.state.filter;
+        filter.tag = tag;
+        this.setState({
+            filter: filter
+        });
+        console.log("[UPDATE]:\t\tupdate filter.tag to", tag)
+    };
+
+
+
+    _fetchData = () => {
+        console.log("[REQUEST]:\tget all letters\tvia /letter.");
+        fetch(utils.webroot + "/letter/?from=" + this.state.filter.from +
+            '&to=' + this.state.filter.to +'&tag=' + this.state.filter.tag )
+        .then((response) => {
+            if(response.status === 200)
+                return response.json();
+            else
+                throw "[RESPONSE]:\t" + response.status.toString() + "\t/letter: ..."
+        })
+        .then((responseJson) => {
+            console.log("[RESPONSE]:\t200\t/letter: ...");
+            this.setState({
+                letterCount: responseJson.letterCount,
+                letterList: responseJson.letterList,
+                refreshing: false
+            });
+            console.log(this.state);
+
+        })
+        .catch((error) => {
+            console.log(error);
+            this.setState({
+                refreshing: false
+            });
+        });
+    };
+
+    render() {
+        // this._fetchData();
+        // let letterList = this.state.letterList.map((item, index) => this.renderLetter(item, index));
+        let now = new Date();
+        return (
+            <Drawer
+                ref={(ref) => this._drawer = ref}
+                content={<Menu />}
+                openDrawerOffset={0.3}
+                tapToClose={true}
+
+            >
+                <View style={{backgroundColor:'#f8f8f8', flex:1}}>
+                    <View style={styles.topBar}>
+                        <View style={styles.flexStart}>
+                            <TouchableOpacity onPress={this._openDrawer}>
+                                <Image source={require('../images/home/status.png')} style={[{height: 34, width: 34, marginRight: 30}]}/>
+                            </TouchableOpacity>
+                            <Text style={{fontSize:20,color:'white'}}>{now.getMonth()+1}月{now.getDate()}日</Text>
+                        </View>
+                        <View style={styles.flexStart}>
+                            <TouchableOpacity onPress={() => {
+                                this.props.navigation.navigate('Search', {
+                                    setTag: this._setTag,
+                                    fresh: this._fetchData,
+                                })}}>
+                                <Image source={require('../images/home/search.png')} style={{height: 25, width: 25}}/>
+                            </TouchableOpacity>
+                            <Image source={require('../images/home/more.png')} style={{height: 27, width: 5, marginLeft: 40, marginRight: 10}}/>
+                        </View>
+                    </View>
+
+                    <View style={{flexDirection: "row",justifyContent: "space-around",alignItems: "center",
+                                    maxHeight: 60,padding: 20, backgroundColor: 'white'}}>
+                        <Text style={{fontSize: 16,fontFamily: 'yuesong'}}>送往日期</Text>
+                        <TouchableOpacity onPress={() => {this.setState({dateTimePickerType: "pickFrom"});this.showDateTimePicker()}} >
+                            <Text style={{fontSize: 16, backgroundColor: "#f8f8f8", paddingVertical: 5, paddingHorizontal:15 }}>
+                                {this.state.filter.from ? this.state.filter.from : '盘古开天辟地'}
+                            </Text>
+                        </TouchableOpacity>
+                        <Text style={{fontSize: 16,fontFamily: 'yuesong'}}>至</Text>
+                        <TouchableOpacity onPress={() => {this.setState({dateTimePickerType: "pickTo"});this.showDateTimePicker()}} >
+                            <Text style={{fontSize: 16, backgroundColor: "#f8f8f8", paddingVertical: 5, paddingHorizontal:15}}>
+                                {this.state.filter.to ?
+                                    this.state.filter.to :
+                                    new Date().getFullYear() + '/' + (new Date().getMonth()+1) + '/' + new Date().getDate()
+                                }
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <FlatList data={this.state.letterList} renderItem={({item}) => this.renderLetter(item)}
+                                keyExtractor={(item, index) => item.id}
+                                ListHeaderComponent={
+                                    <View style={[styles.flexCenter,{marginTop: 20}]}>
+                                        <Text style={{fontSize: 16, fontFamily:'yuesong'}}>—— 当前已有 {this.state.letterCount} 封信件 ——</Text>
+                                    </View>}
+                                ListFooterComponent={
+                                     <View style={[styles.flexCenter,{marginBottom: 20}]}>
+                                        <Text style={{fontSize: 16,fontFamily: 'yuesong'}}>—— 完 ——</Text>
+                                    </View>}
+                                onRefresh={() => {this._fetchData()}}
+                                refreshing={this.state.refreshing}
+                                />
+                    <TouchableOpacity onPress={() => {this.setState({dateTimePickerType: "navigation"});this.showDateTimePicker()}}
+                                        style={{position: 'absolute',bottom: 35,right: 37,}}>
+                        <View style={[styles.flexCenter, styles.textBg]}>
+                            <Image source={require('../images/home/send.png')} style={{height: 48, width: 56}}/>
+                        </View>
+                        <DateTimePicker
+                          isVisible={this.state.isDateTimePickerVisible}
+                          onConfirm={this.handleDatePicked}
+                          onCancel={this.hideDateTimePicker}
+                          mode={'date'}
+                          maximumDate={now}
+                        />
+                    </TouchableOpacity>
+                </View>
+            </Drawer>
+        );
+    }
+
+    // letter的render策略：
+    // 每次fetchData调取某个固定数量的信件，比如10.
+    // 当距离页面底部不远的时候，再次fetchData，填充letterList
+
+    renderLetter(item){
+        let tagContents = item.tags;
+        let tags = tagContents.map((content) =>
+            <Text style={{fontSize: 16, color: 'black', backgroundColor: "#E8E8E8",fontFamily: 'yuesong',
+                        paddingVertical: 5, paddingHorizontal: 12, marginRight: 15, marginVertical: 5}}>
+                {content}
+            </Text> );
+        return (
+            <View style={{justifyContent: "space-between",alignItems: "center",flexDirection: 'row', flex: 1,
+                            paddingLeft: 30, paddingVertical:20, width: '100%'}} key={item}>
+                <View style={{justifyContent: "center",alignItems: "center",flexDirection: 'column', marginRight:30, flex: 2}}>
+                    <View style={{justifyContent: "center",alignItems: "center",flexDirection: 'column'}}>
+                        <Text style={{fontSize: 18}}>{item.from[0]}</Text>
+                        <Text style={{fontSize: 14}}>{item.from[1]}/{item.from[2]}</Text>
+                    </View>
+                    <Image source={require('../images/home/down.png')} style={{height: 16, width: 13, margin: 5}}/>
+                    <View style={{justifyContent: "center",alignItems: "center",flexDirection: 'column'}}>
+                        <Text style={{fontSize: 18}}>{item.to[0]}</Text>
+                        <Text style={{fontSize: 14}}>{item.to[1]}/{item.to[2]}</Text>
+                    </View>
+                </View>
+
+                <View style={{/*minHeight: 160, */backgroundColor: "white", padding: 20, flex: 8}}>
+                    <Text style={{fontSize: 18, color: "#2B1301", marginBottom: 10, fontFamily:'yuesong'}} >{item.title}</Text>
+                    <Text style={{fontSize: 16,marginBottom: 20,fontFamily: 'yuesong'}}>{item.content}</Text>
+                    <View style={{justifyContent: "flex-start",alignItems: "center",flexDirection: 'row',flexWrap: "wrap"}}>
+                        {tags}
+                    </View>
+                </View>
+            </View>
+        )
     }
 
 
@@ -22,116 +208,132 @@ class Home extends Component {
     };
 
     hideDateTimePicker = () => {
-        this.setState({ isDateTimePickerVisible: false });
+        this.setState({
+            isDateTimePickerVisible: false,
+            dateTimePickerType: "",
+        });
     };
 
     handleDatePicked = date => {
-        console.log("A date has been picked: ", date);
-        this.hideDateTimePicker();
-        this.props.navigation.navigate('Edit',{
-            end_year: date.getFullYear(),
-            end_month: date.getMonth()+1,
-            end_day: date.getDate(),
-            feedBack: this._fetchData,
-        });
+        let filter = this.state.filter;
+        switch(this.state.dateTimePickerType){
+            case "navigation":
+                // console.log("A date has been picked: ", date);
+                this.hideDateTimePicker();
+                this.props.navigation.navigate('Edit',{
+                    end_year: date.getFullYear(),
+                    end_month: date.getMonth()+1,
+                    end_day: date.getDate(),
+                    fresh: this._fetchData,
+                });
+                break;
+            case "pickFrom":
+                filter.from = utils.encodeDate(date)
+                this.setState({
+                    filter: filter,
+                })
+                this._fetchData()
+                this.hideDateTimePicker()
+                break;
+            case "pickTo":
+                filter.to = utils.encodeDate(date)
+                this.setState({
+                    filter: filter,
+                })
+                this._fetchData();
+                this.hideDateTimePicker()
+                break;
+        }
+
     };
-
-    _fetchData = () => {
-        console.log("fetch data from /letter");
-        fetch("http://49.235.93.122:8080" + "/letter")
-        .then((response) => {
-            return response.json();
-        })
-        .then((responseJson) => {
-            // console.log(responseJson);
-            this.setState(responseJson);        
-        })
-        .catch((error) => {
-            console.error(error);
-            this.setState({letterCount: error});
-        });
-    }
-
-    _keyExtractor = (item, index) => item.id;
+}
 
 
-    render() {
-        // this._fetchData();
-        let letterList = this.state.letterList.map((item, index) => this.renderLetter(item, index));
-        let now = new Date();
-        return (
-            <View style={{backgroundColor:'#fefdfb', flex:1}}>
-                <View style={styles.topBar}>
-                    <View style={styles.flexStart}>
-                        <Image source={require("../images/home/status.png")} style={[{height:34,width:34,marginRight:30}]}></Image>
-                        <Text style={{fontSize:20,color:'white'}}>{now.getMonth()+1}月{now.getDate()}日</Text>
-                    </View>
-                    <View style={styles.flexStart}>
-                        <Image source={require("../images/home/search.png")} style={{height:25,width:25}}></Image>
-                        <Image source={require("../images/home/more.png")} style={{height:27,width:5,marginLeft:40,marginRight:10}}></Image>
-                    </View>
+class Menu extends Component{
+    render(){
+        return(
+            <View>
+                <View style={{height: 40, flexDirection: "row", backgroundColor:"#d77484", justifyContent: "center",
+                    alignItems: "center", padding: 30, width: '100%'}}>
+                    {/*<Text style={{color:"#33A3F4"}}>占位</Text>*/}
+                    <Text style={{color:"white"}}>设置</Text>
+                    {/*<Icon name={"setting"} color={"white"}/>*/}
+                    {/*{this.state.isLogin ?*/}
+                    {/*    <Text style={{color: "white"}} onPress={this.logout}>登出</Text>*/}
+                    {/*    :<Text style={{color:"#33A3F4"}}>占位</Text>}*/}
                 </View>
-                <View style={{flexDirection: "row",justifyContent: "space-around",alignItems: "center",maxHeight: 60,padding: 24,}}>
-                    <View style={styles.flexStart}>
-                        <Image source={require("../images/home/status.png")} style={[{height:34,width:34,marginRight:30}]}></Image>
-                        <Text style={{fontSize:20,color:'white'}}>{now.getMonth()+1}月{now.getDate()}日</Text>
-                    </View>
-                    <View style={styles.flexStart}>
-                        <Image source={require("../images/home/search.png")} style={{height:25,width:25}}></Image>
-                        <Image source={require("../images/home/more.png")} style={{height:27,width:5,marginLeft:40,marginRight:10}}></Image>
-                    </View>
+                <View style={{backgroundColor:"#d77484", justifyContent: "flex-start", alignItems: "center",
+                    height: 180, flexDirection: "column", paddingTop: 10}}>
+                    <Image style={{height:75, width:75, borderRadius: 75, backgroundColor:"white"}}
+                           source={require("../images/home/avatar.jpg")} />
+                    {/*{this.state.isLogin ?*/}
+                    {/*    // 如果已经登陆*/}
+                        {/*<Text style={{marginTop: 30, color: "white"}}>{this.state.username}</Text> :*/}
+                        {/*//如果没有登陆*/}
+                        <View style={{flexDirection: "row",marginVertical:15, alignItems:"center"}}>
+                            <Button onPress={() => {
+                                this.props.navigation.push("Login",
+                                    {onUserLogin: this.onUserLogin})
+                            }}
+                                    style={{paddingHorizontal:20, marginHorizontal: 30, backgroundColor:"#a16a72", borderWidth:0,}}
+                                    textStyle={{fontSize: 18}}>
+                                <Text style={{color: "white"}}>登陆</Text>
+                            </Button>
+                            <Button onPress={() => {
+                                this.props.navigation.push("Register",
+                                    {onUserLogin: this.onUserLogin})
+                            }}
+                                    style={{paddingHorizontal:20, marginHorizontal: 10, backgroundColor:"#a16a72", borderWidth:0,}}
+                                    textStyle={{fontSize: 18}}>
+                                <Text style={{color: "white"}}>注册</Text>
+                            </Button>
+                        </View>
+                    {/*}*/}
                 </View>
-                
-                <FlatList data={this.state.letterList} renderItem={({item}) => this.renderLetter(item)} 
-                            keyExtractor={(item, index) => item.id}
-                            ListHeaderComponent={
-                                <View style={[styles.flexCenter,{marginTop: 20}]}>
-                                    <Text style={{fontSize: 16}}>—— 当前已有 {this.state.letterCount} 封信件 ——</Text>
-                                </View>}
-                            ListFooterComponent={
-                                 <View style={[styles.flexCenter,{marginBottom: 20}]}>
-                                    <Text style={{fontSize: 16}}>—— 完 ——</Text>
-                                </View>}                               
-                            />
-                <TouchableOpacity onPress={this.showDateTimePicker} style={{position: 'absolute',bottom: 35,right: 37,}}>
-                    <View style={[styles.flexCenter, styles.textBg]}>
-                        <Image source={require("../images/home/send.png")} style={{height:48 ,width:56}}></Image>
-                    </View>
-                    <DateTimePicker
-                      isVisible={this.state.isDateTimePickerVisible}
-                      onConfirm={this.handleDatePicked}
-                      onCancel={this.hideDateTimePicker}
-                      mode={'date'}
-                      maximumDate={now}
-                    />
-                </TouchableOpacity>
-            </View>
-        );
-    }
-
-    renderLetter(item){
-        // console.log(item);
-        return (
-            <View style={{justifyContent: "space-between",alignItems: "flex-start",flexDirection: 'row', 
-                            paddingRight: 20, paddingLeft: 30, paddingVertical:20, width: '100%'}} key={item}>
-                <View style={{justifyContent: "center",alignItems: "flex-start",flexDirection: 'column', marginRight:30, marginTop: 30}}>
-                    <View style={{justifyContent: "center",alignItems: "center",flexDirection: 'column'}}>
-                        <Text style={{fontSize: 18}}>{item.from[0]}</Text>
-                        <Text style={{fontSize: 14}}>{item.from[1]}/{item.from[2]}</Text>
-                    </View>
-                    <Image source={require("../images/home/down.png")} style={{height: 16, width: 13, margin: 15}}></Image>
-                    <View style={{justifyContent: "center",alignItems: "center",flexDirection: 'column'}}>
-                        <Text style={{fontSize: 18}}>{item.to[0]}</Text>
-                        <Text style={{fontSize: 14}}>{item.to[1]}/{item.to[2]}</Text>
-                    </View>
-                </View>
-                <View style={{height: 240, width: 280, backgroundColor: "#fffcd8", padding: 26}}>
-                    <Text style={{fontSize: 16}}>{item.content}</Text>
+                <View>
+                    <List>
+                        <Item
+                            thumb={
+                                <Image source={require("../images/home/font.png")}
+                                       style={{height:20,width:20,marginRight:20}}
+                                       resizeMode={"contain"}/>}
+                            arrow="horizontal"
+                            key="1"
+                            onPress={() => this.props.navigation.push('Statistics',{
+                                'plan':this.state.plan,
+                                'username':this.state.username,
+                            })}
+                        >
+                            字体更改
+                        </Item>
+                        <Item
+                            thumb={
+                                <Image source={require("../images/home/letter.png")}
+                                       style={{height:20,width:20,marginRight:20}}
+                                       resizeMode={"contain"}/>}
+                            arrow="horizontal"
+                            key="2"
+                            onPress={this.showPicker}
+                        >
+                            我的信件
+                        </Item>
+                        <Item
+                            thumb={
+                                <Image source={require("../images/home/about.png")}
+                                       style={{height:20,width:20,marginRight:20}}
+                                       resizeMode={"contain"}/>}
+                            arrow="horizontal"
+                            key="3"
+                        >
+                            关于
+                        </Item>
+                    </List>
                 </View>
             </View>
         )
     }
 }
+
 
 
 const styles = StyleSheet.create({
@@ -163,8 +365,11 @@ const styles = StyleSheet.create({
         width:  95,
         backgroundColor: 'rgb(128, 194, 105)',
         borderRadius: 85,
-        
-    }
+
+    },
+    yuesong:{
+        fontFamily: 'yuesong'
+    },
 });
 
 export default Home;

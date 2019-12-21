@@ -9,7 +9,7 @@ class Intro extends Component {
     componentDidMount(){
         setTimeout(() => {
             this.props.navigation.navigate('Home')
-        }, 5000)
+        }, 1000)
     } 
 
     render() {
@@ -26,6 +26,10 @@ class Intro extends Component {
                 }
             </View>
         );
+    }
+
+    componentWillUnMount(){
+        console.log("Unmount")
     }
 }
 

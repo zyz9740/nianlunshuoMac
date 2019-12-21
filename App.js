@@ -6,6 +6,7 @@ import { createStackNavigator } from 'react-navigation-stack';
 import Intro from "./src/Intro";
 import Home from "./src/Home"
 import Edit from "./src/Edit"
+import Search from "./src/Search"
 import './utils.js'
 
 const AppNavigator = createStackNavigator(
@@ -18,6 +19,9 @@ const AppNavigator = createStackNavigator(
         },
         Edit: {
             screen: Edit
+        },
+        Search:{
+            screen: Search
         }
     },
     {
