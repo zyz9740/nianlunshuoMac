@@ -7,6 +7,9 @@ import Intro from "./src/Intro";
 import Home from "./src/Home"
 import Edit from "./src/Edit"
 import Search from "./src/Search"
+import Login from "./src/Login"
+import Register from "./src/Register"
+import Menu from "./src/Menu"
 import './utils.js'
 
 const AppNavigator = createStackNavigator(
@@ -22,7 +25,17 @@ const AppNavigator = createStackNavigator(
         },
         Search:{
             screen: Search
+        },
+        Login:{
+            screen: Login
+        },
+        Register:{
+            screen: Register
+        },
+        Menu:{
+            screen: Menu
         }
+
     },
     {
         initialRouteName: 'Intro',

@@ -2,13 +2,11 @@ import React, { Component } from 'react';
 import {StyleSheet, Image, Text, View, FlatList, TouchableOpacity} from 'react-native';
 import DateTimePicker from "react-native-modal-datetime-picker";
 import {Icon, List} from "@ant-design/react-native";
-import Button from 'apsl-react-native-button'
-
 
 // import {setCustomText} from 'react-native-global-props';
 import Drawer from 'react-native-drawer'
-const Item = List.Item;
 
+import Menu from "./Menu"
 
 const utils = require("./utils");
 // setCustomText({style: {fontFamily: 'yuesong'}});
@@ -90,7 +88,7 @@ class Home extends Component {
         return (
             <Drawer
                 ref={(ref) => this._drawer = ref}
-                content={<Menu />}
+                content={<Menu navigation={this.props.navigation}/>}
                 openDrawerOffset={0.3}
                 tapToClose={true}
 
@@ -249,90 +247,7 @@ class Home extends Component {
 }
 
 
-class Menu extends Component{
-    render(){
-        return(
-            <View>
-                <View style={{height: 40, flexDirection: "row", backgroundColor:"#d77484", justifyContent: "center",
-                    alignItems: "center", padding: 30, width: '100%'}}>
-                    {/*<Text style={{color:"#33A3F4"}}>占位</Text>*/}
-                    <Text style={{color:"white"}}>设置</Text>
-                    {/*<Icon name={"setting"} color={"white"}/>*/}
-                    {/*{this.state.isLogin ?*/}
-                    {/*    <Text style={{color: "white"}} onPress={this.logout}>登出</Text>*/}
-                    {/*    :<Text style={{color:"#33A3F4"}}>占位</Text>}*/}
-                </View>
-                <View style={{backgroundColor:"#d77484", justifyContent: "flex-start", alignItems: "center",
-                    height: 180, flexDirection: "column", paddingTop: 10}}>
-                    <Image style={{height:75, width:75, borderRadius: 75, backgroundColor:"white"}}
-                           source={require("../images/home/avatar.jpg")} />
-                    {/*{this.state.isLogin ?*/}
-                    {/*    // 如果已经登陆*/}
-                        {/*<Text style={{marginTop: 30, color: "white"}}>{this.state.username}</Text> :*/}
-                        {/*//如果没有登陆*/}
-                        <View style={{flexDirection: "row",marginVertical:15, alignItems:"center"}}>
-                            <Button onPress={() => {
-                                this.props.navigation.push("Login",
-                                    {onUserLogin: this.onUserLogin})
-                            }}
-                                    style={{paddingHorizontal:20, marginHorizontal: 30, backgroundColor:"#a16a72", borderWidth:0,}}
-                                    textStyle={{fontSize: 18}}>
-                                <Text style={{color: "white"}}>登陆</Text>
-                            </Button>
-                            <Button onPress={() => {
-                                this.props.navigation.push("Register",
-                                    {onUserLogin: this.onUserLogin})
-                            }}
-                                    style={{paddingHorizontal:20, marginHorizontal: 10, backgroundColor:"#a16a72", borderWidth:0,}}
-                                    textStyle={{fontSize: 18}}>
-                                <Text style={{color: "white"}}>注册</Text>
-                            </Button>
-                        </View>
-                    {/*}*/}
-                </View>
-                <View>
-                    <List>
-                        <Item
-                            thumb={
-                                <Image source={require("../images/home/font.png")}
-                                       style={{height:20,width:20,marginRight:20}}
-                                       resizeMode={"contain"}/>}
-                            arrow="horizontal"
-                            key="1"
-                            onPress={() => this.props.navigation.push('Statistics',{
-                                'plan':this.state.plan,
-                                'username':this.state.username,
-                            })}
-                        >
-                            字体更改
-                        </Item>
-                        <Item
-                            thumb={
-                                <Image source={require("../images/home/letter.png")}
-                                       style={{height:20,width:20,marginRight:20}}
-                                       resizeMode={"contain"}/>}
-                            arrow="horizontal"
-                            key="2"
-                            onPress={this.showPicker}
-                        >
-                            我的信件
-                        </Item>
-                        <Item
-                            thumb={
-                                <Image source={require("../images/home/about.png")}
-                                       style={{height:20,width:20,marginRight:20}}
-                                       resizeMode={"contain"}/>}
-                            arrow="horizontal"
-                            key="3"
-                        >
-                            关于
-                        </Item>
-                    </List>
-                </View>
-            </View>
-        )
-    }
-}
+
 
 
 
