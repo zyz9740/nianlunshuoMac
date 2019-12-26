@@ -39,6 +39,8 @@
 		3ECA86A112154ACE88480017 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2F0779E31FA6491191B5BD36 /* Octicons.ttf */; };
 		74C265AA02984881B7939445 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5C6FD14315EF4812B2D77CA4 /* SimpleLineIcons.ttf */; };
 		470B8AF493F3403CA4B03D18 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 85AA2ADA238C4CC7B90396DB /* Zocial.ttf */; };
+		753CEC545E0B4A959F40FFB3 /* kangxi.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2CC6DAB1DA644B5A812B8D15 /* kangxi.ttf */; };
+		85EA30897FA6442BBA9A7A65 /* Qute.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7212298CF1E74AB7847656BE /* Qute.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -106,6 +108,8 @@
 		2F0779E31FA6491191B5BD36 /* Octicons.ttf */ = {isa = PBXFileReference; name = "Octicons.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		5C6FD14315EF4812B2D77CA4 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; name = "SimpleLineIcons.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		85AA2ADA238C4CC7B90396DB /* Zocial.ttf */ = {isa = PBXFileReference; name = "Zocial.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		2CC6DAB1DA644B5A812B8D15 /* kangxi.ttf */ = {isa = PBXFileReference; name = "kangxi.ttf"; path = "../assets/fonts/kangxi.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		7212298CF1E74AB7847656BE /* Qute.ttf */ = {isa = PBXFileReference; name = "Qute.ttf"; path = "../assets/fonts/Qute.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -260,6 +264,8 @@
 				2F0779E31FA6491191B5BD36 /* Octicons.ttf */,
 				5C6FD14315EF4812B2D77CA4 /* SimpleLineIcons.ttf */,
 				85AA2ADA238C4CC7B90396DB /* Zocial.ttf */,
+				2CC6DAB1DA644B5A812B8D15 /* kangxi.ttf */,
+				7212298CF1E74AB7847656BE /* Qute.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -429,6 +435,8 @@
 				3ECA86A112154ACE88480017 /* Octicons.ttf in Resources */,
 				74C265AA02984881B7939445 /* SimpleLineIcons.ttf in Resources */,
 				470B8AF493F3403CA4B03D18 /* Zocial.ttf in Resources */,
+				753CEC545E0B4A959F40FFB3 /* kangxi.ttf in Resources */,
+				85EA30897FA6442BBA9A7A65 /* Qute.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

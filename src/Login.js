@@ -1,38 +1,12 @@
 import React, { Component } from 'react';
 import {Text, View,StyleSheet,TextInput } from "react-native";
-import {ActivityIndicator, InputItem, List} from "@ant-design/react-native";
+import {ActivityIndicator, InputItem, List, Toast} from "@ant-design/react-native";
 import Button from 'apsl-react-native-button'
 
 import {TextInputLayout} from 'rn-textinputlayout';
 const Item = List.Item;
 
-//日期格式化
-Date.prototype.Format = function(formatStr)
-{
-    var str = formatStr;
-    var Week = ['日','一','二','三','四','五','六'];
-
-    str=str.replace(/yyyy|YYYY/,this.getFullYear());
-    str=str.replace(/yy|YY/,(this.getYear() % 100)>9?(this.getYear() % 100).toString():'0' + (this.getYear() % 100));
-
-    str=str.replace(/MM/,(this.getMonth()+1)>9?this.getMonth().toString():'0' + (this.getMonth()+1));
-    str=str.replace(/M/g,(this.getMonth()+1));
-
-    str=str.replace(/w|W/g,Week[this.getDay()]);
-
-    str=str.replace(/dd|DD/,this.getDate()>9?this.getDate().toString():'0' + this.getDate());
-    str=str.replace(/d|D/g,this.getDate());
-
-    str=str.replace(/hh|HH/,this.getHours()>9?this.getHours().toString():'0' + this.getHours());
-    str=str.replace(/h|H/g,this.getHours());
-    str=str.replace(/mm/,this.getMinutes()>9?this.getMinutes().toString():'0' + this.getMinutes());
-    str=str.replace(/m/g,this.getMinutes());
-
-    str=str.replace(/ss|SS/,this.getSeconds()>9?this.getSeconds().toString():'0' + this.getSeconds());
-    str=str.replace(/s|S/g,this.getSeconds());
-
-    return str;
-}
+const utils = require("./utils")
 
 export default class Login extends Component{
     static navigationOptions = {
@@ -42,79 +16,71 @@ export default class Login extends Component{
     constructor(props){
         super(props);
         this.state = {
-            username:"",
-            password:"",
+            username: "",
+            password: "",
             animating:false,
         }
     }
 
-    componentDidMount() {
-        console.log(this.props);
-    }
 
     login(){
-        // fetch(webRoot + "login", {
-        //     method: 'POST',
-        //     headers: {
-        //         'Accept': 'application/json',
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({
-        //         username: this.state.username,
-        //         password: this.state.password,
-        //         time: new Date().Format("yyyy/MM/dd"),
-        //     })
-        // }).then((response) => response.json())
-        //     .then((responseJson) => {
-        //         let isSuccess = responseJson.isSuccess;
-        //         let userExist = responseJson.userExist;
-        //         console.log("responseJson",responseJson);
-        //         if(!userExist){     //如果用户不存在
-        //             ToastAndroidTest.show("用户名不存在", ToastAndroidTest.SHORT);
-        //             this.setState({
-        //                 username:"",
-        //                 password:"",
-        //                 animating: !this.state.animating
-        //             })
-        //         }else if(!isSuccess){
-        //             ToastAndroidTest.show("登陆异常", ToastAndroidTest.SHORT);
-        //             this.setState({
-        //                 username:"",
-        //                 password:"",
-        //                 ensure:"",
-        //                 animating: !this.state.animating
-        //             });
-        //         }else {
-        //             this.setState({animating: !this.state.animating});
-        //             ToastAndroidTest.show("登陆成功", ToastAndroidTest.SHORT);
-        //             this.props.navigation.state.params.onUserLogin(this.state.username);
-        //             this.props.navigation.goBack()
-        //         }
-        //     })
-        //     .catch((error) => {
-        //         console.error(error);
-        //         ToastAndroidTest.show("您的用户名已被注册", ToastAndroidTest.SHORT);
-        //         ToastAndroidTest.show("请重新输入", ToastAndroidTest.SHORT);
-        //         this.setState({
-        //             username:"",
-        //             password:"",
-        //             ensure:"",
-        //             animating: !this.state.animating
-        //         })
-        //     });
+        let formData = new FormData();
+        formData.append('username', this.state.username);
+        formData.append('password', this.state.password);
+
+        console.log("[REQUEST]:\tlogin\tvia /letter/login.");
+
+        fetch( utils.webroot + "/letter/login/", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            body: formData
+        }).then((response) => response.json())
+            .then((responseJson) => {
+                let isSuccess = responseJson.isSuccess;
+                let userExist = responseJson.userExist;
+                console.log("[RESPONSE]:\t200\t/letter/login: ", responseJson);
+
+                if(!userExist){     //如果用户不存在
+                    Toast.info("用户名不存在", 1000);
+                    this.setState({
+                        username:"",
+                        password:"",
+                        animating: !this.state.animating
+                    })
+                }else if(!isSuccess){
+                    Toast.fail("登陆异常", 1000);
+                    this.setState({
+                        username:"",
+                        password:"",
+                        ensure:"",
+                        animating: !this.state.animating
+                    });
+                }else {
+                    this.setState({animating: !this.state.animating});
+                    Toast.info("登陆成功", 1000);
+                    this.props.navigation.state.params.onUsernameChange(this.state.username, responseJson.userId);
+                    this.props.navigation.goBack()
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+                Toast.fail("您的用户名已被注册", 1000);
+                Toast.fail("请重新输入", 1000);
+                this.setState({
+                    username:"",
+                    password:"",
+                    ensure:"",
+                    animating: !this.state.animating
+                })
+            });
     }
 
-    //??为什么他用箭头函数不行？？？？
     _onPressSubmit(){
-        // this.setState({animating: !this.state.animating});
-        // //网络请求
-        // this.login()
-        // this.closeTimer = setTimeout(() => {
-        //     this.setState({animating: !this.state.animating});
-        //     ToastAndroidTest.show("登陆成功", ToastAndroidTest.SHORT);
-        //     this.props.navigation.state.params.onUserLogin(this.state.username)
-        //     this.props.navigation.goBack()
-        // }, 5000);
+        this.setState({animating: !this.state.animating});
+        //网络请求
+        this.login();
     };
 
     render(){

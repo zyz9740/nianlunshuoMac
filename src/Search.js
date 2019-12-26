@@ -73,7 +73,7 @@ class Search extends Component {
                         onChangeText={search => this.setState({ search })}
                         onCancel={() => this.props.navigation.goBack()}
                     />
-                    <TouchableOpacity onPress={this._setTag} style={{flex: 2}}>
+                    <TouchableOpacity onPress={() => this._setTag()} style={{flex: 2}}>
                         <Text style={{fontSize: 25, color: "white", textAlign:"center"}}>
                             {this.state.search ? "搜索":"取消"}
                         </Text>

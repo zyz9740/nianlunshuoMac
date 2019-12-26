@@ -26,6 +26,8 @@ class Home extends Component {
                 to:     "",
                 tag:    "",                // only one tag can be searched at one time
             },
+            username:   "",
+            userId:     -1,
             //state
             isDateTimePickerVisible: false,
             dateTimePickerType: "",              // the type of dateTime, type is one of ["", "navigation", "pickFrom", "pickTo"]
@@ -55,8 +57,9 @@ class Home extends Component {
 
     _fetchData = () => {
         console.log("[REQUEST]:\tget all letters\tvia /letter.");
+        console.log(this.state);
         fetch(utils.webroot + "/letter/?from=" + this.state.filter.from +
-            '&to=' + this.state.filter.to +'&tag=' + this.state.filter.tag )
+            '&to=' + this.state.filter.to +'&tag=' + this.state.filter.tag + '&userId=' + this.state.userId)
         .then((response) => {
             if(response.status === 200)
                 return response.json();
@@ -64,14 +67,12 @@ class Home extends Component {
                 throw "[RESPONSE]:\t" + response.status.toString() + "\t/letter: ..."
         })
         .then((responseJson) => {
-            console.log("[RESPONSE]:\t200\t/letter: ...");
+            console.log("[RESPONSE]:\t200\t/letter: ", responseJson);
             this.setState({
                 letterCount: responseJson.letterCount,
                 letterList: responseJson.letterList,
                 refreshing: false
             });
-            console.log(this.state);
-
         })
         .catch((error) => {
             console.log(error);
@@ -81,6 +82,21 @@ class Home extends Component {
         });
     };
 
+    _initFilter = () => {
+        let filter = {from: "", to: "", tag: ""};
+        this.setState({filter: filter, refreshing: true}, this._fetchData);
+    }
+
+    onUsernameChange = (username, userId) => {
+        this.setState({
+            username: username,
+            userId: userId,
+        });
+        console.log("[UPDATE]:\t\tupdate username to", username);
+        console.log("[UPDATE]:\t\tupdate userId to", userId);
+    }
+
+
     render() {
         // this._fetchData();
         // let letterList = this.state.letterList.map((item, index) => this.renderLetter(item, index));
@@ -88,7 +104,11 @@ class Home extends Component {
         return (
             <Drawer
                 ref={(ref) => this._drawer = ref}
-                content={<Menu navigation={this.props.navigation}/>}
+                content={<Menu
+                    navigation={this.props.navigation}
+                    username={this.state.username}
+                    onUsernameChange={this.onUsernameChange}
+                />}
                 openDrawerOffset={0.3}
                 tapToClose={true}
 
@@ -97,7 +117,7 @@ class Home extends Component {
                     <View style={styles.topBar}>
                         <View style={styles.flexStart}>
                             <TouchableOpacity onPress={this._openDrawer}>
-                                <Image source={require('../images/home/status.png')} style={[{height: 34, width: 34, marginRight: 30}]}/>
+                                <Image source={require('../images/home/setting.png')} style={[{height: 34, width: 34, marginRight: 30}]}/>
                             </TouchableOpacity>
                             <Text style={{fontSize:20,color:'white'}}>{now.getMonth()+1}月{now.getDate()}日</Text>
                         </View>
@@ -109,19 +129,22 @@ class Home extends Component {
                                 })}}>
                                 <Image source={require('../images/home/search.png')} style={{height: 25, width: 25}}/>
                             </TouchableOpacity>
-                            <Image source={require('../images/home/more.png')} style={{height: 27, width: 5, marginLeft: 40, marginRight: 10}}/>
+                            <TouchableOpacity onPress={this._initFilter}>
+                                <Image source={require('../images/home/refresh.png')}
+                                       style={{height: 25, width: 25, marginLeft: 40, marginRight: 10}}/>
+                            </TouchableOpacity>
                         </View>
                     </View>
 
                     <View style={{flexDirection: "row",justifyContent: "space-around",alignItems: "center",
                                     maxHeight: 60,padding: 20, backgroundColor: 'white'}}>
-                        <Text style={{fontSize: 16,fontFamily: 'yuesong'}}>送往日期</Text>
+                        <Text style={{fontSize: 16}}>送往日期</Text>
                         <TouchableOpacity onPress={() => {this.setState({dateTimePickerType: "pickFrom"});this.showDateTimePicker()}} >
                             <Text style={{fontSize: 16, backgroundColor: "#f8f8f8", paddingVertical: 5, paddingHorizontal:15 }}>
                                 {this.state.filter.from ? this.state.filter.from : '盘古开天辟地'}
                             </Text>
                         </TouchableOpacity>
-                        <Text style={{fontSize: 16,fontFamily: 'yuesong'}}>至</Text>
+                        <Text style={{fontSize: 16}}>至</Text>
                         <TouchableOpacity onPress={() => {this.setState({dateTimePickerType: "pickTo"});this.showDateTimePicker()}} >
                             <Text style={{fontSize: 16, backgroundColor: "#f8f8f8", paddingVertical: 5, paddingHorizontal:15}}>
                                 {this.state.filter.to ?
@@ -136,11 +159,12 @@ class Home extends Component {
                                 keyExtractor={(item, index) => item.id}
                                 ListHeaderComponent={
                                     <View style={[styles.flexCenter,{marginTop: 20}]}>
-                                        <Text style={{fontSize: 16, fontFamily:'yuesong'}}>—— 当前已有 {this.state.letterCount} 封信件 ——</Text>
+                                        <Text style={{fontSize: 16}}>—— 当前已有 {this.state.letterCount} 封信件 ——</Text>
                                     </View>}
                                 ListFooterComponent={
                                      <View style={[styles.flexCenter,{marginBottom: 20}]}>
-                                        <Text style={{fontSize: 16,fontFamily: 'yuesong'}}>—— 完 ——</Text>
+                                        <Text style={{fontSize: 16
+                                        }}>—— 完 ——</Text>
                                     </View>}
                                 onRefresh={() => {this._fetchData()}}
                                 refreshing={this.state.refreshing}
@@ -170,7 +194,7 @@ class Home extends Component {
     renderLetter(item){
         let tagContents = item.tags;
         let tags = tagContents.map((content) =>
-            <Text style={{fontSize: 16, color: 'black', backgroundColor: "#E8E8E8",fontFamily: 'yuesong',
+            <Text style={{fontSize: 16, color: 'black', backgroundColor: "#E8E8E8",
                         paddingVertical: 5, paddingHorizontal: 12, marginRight: 15, marginVertical: 5}}>
                 {content}
             </Text> );
@@ -190,8 +214,8 @@ class Home extends Component {
                 </View>
 
                 <View style={{/*minHeight: 160, */backgroundColor: "white", padding: 20, flex: 8}}>
-                    <Text style={{fontSize: 18, color: "#2B1301", marginBottom: 10, fontFamily:'yuesong'}} >{item.title}</Text>
-                    <Text style={{fontSize: 16,marginBottom: 20,fontFamily: 'yuesong'}}>{item.content}</Text>
+                    <Text style={{fontSize: 18, color: "#2B1301", marginBottom: 10}} >{item.title}</Text>
+                    <Text style={{fontSize: 16,marginBottom: 20}}>{item.content}</Text>
                     <View style={{justifyContent: "flex-start",alignItems: "center",flexDirection: 'row',flexWrap: "wrap"}}>
                         {tags}
                     </View>
@@ -223,6 +247,7 @@ class Home extends Component {
                     end_month: date.getMonth()+1,
                     end_day: date.getDate(),
                     fresh: this._fetchData,
+                    userId: this.state.userId,
                 });
                 break;
             case "pickFrom":
