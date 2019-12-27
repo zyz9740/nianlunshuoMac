@@ -236,7 +236,7 @@ class Edit extends Component {
                                 <Image style={styles.border} source={require('../images/edit/font.png')} resizeMode="contain"/>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => this.setState({isSecretSwitchVisible: true})}>
-                                <Image style={styles.border} source={require('../images/edit/rollBack.png')} resizeMode="contain"/>
+                                <Image style={styles.border} source={require('../images/edit/secret.png')} resizeMode="contain"/>
                             </TouchableOpacity>
                             <Image style={styles.border} source={require("../images/edit/rollForward.png")} resizeMode="contain"></Image>
                             <Image style={styles.border} source={require("../images/edit/indentation.png")} resizeMode="contain"></Image>
